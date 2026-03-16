@@ -15,6 +15,8 @@ from polars.testing.parametric.strategies import series
 if TYPE_CHECKING:
     from hypothesis.strategies import DrawFn, SearchStrategy
 
+    from tests.conftest import PlMonkeyPatch
+
 
 @pytest.mark.parametrize(
     ("pred_1", "pred_2"),
@@ -690,3 +692,4 @@ def test_boolean_predicate_join_where() -> None:
     assert "NESTED LOOP JOIN" in plan
 
     assert_frame_equal(q.collect(), expect)
+
