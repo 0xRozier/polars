@@ -396,3 +396,28 @@ fn test_window_map_empty_df_3542() -> PolarsResult<()> {
     assert_eq!(out.height(), 0);
     Ok(())
 }
+
+#[test]
+fn test_window_duplicate_partition_by_26921() {
+    // Test that duplicate column names in over() are properly rejected
+    // Issue: https://github.com/pola-rs/polars/issues/26921
+    let df = df![
+        "x" => [1, 2, 3]
+    ]
+    .unwrap();
+
+    // This should fail with a duplicate error
+    let result = df
+        .lazy()
+        .with_columns([len().over([col("x"), col("x")])])
+        .collect();
+
+    assert!(result.is_err());
+    let err = result.unwrap_err();
+    let err_str = err.to_string();
+    assert!(
+        err_str.contains("Duplicate") && err_str.contains("'x'"),
+        "Expected duplicate error for column 'x', got: {}",
+        err_str
+    );
+}
