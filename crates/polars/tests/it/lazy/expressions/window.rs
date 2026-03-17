@@ -416,7 +416,7 @@ fn test_window_duplicate_partition_by_26921() {
     let err = result.unwrap_err();
     let err_str = err.to_string();
     assert!(
-        err_str.contains("Duplicate") && err_str.contains("'x'"),
+        err_str.contains("duplicate") && err_str.contains("'x'"),
         "Expected duplicate error for column 'x', got: {}",
         err_str
     );
