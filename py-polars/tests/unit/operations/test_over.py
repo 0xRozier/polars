@@ -181,3 +181,12 @@ def test_nulls_last_over_24989() -> None:
     )
 
     assert_frame_equal(out, expected)
+
+
+def test_over_duplicate_partition_by_26921() -> None:
+    df = pl.DataFrame({"x": [1, 2, 3]})
+    result = df.with_columns(pl.len().over("x", "x"))
+    expected = pl.DataFrame(
+        {"x": [1, 2, 3], "len": pl.Series([1, 1, 1], dtype=pl.UInt32)}
+    )
+    assert_frame_equal(result, expected)
