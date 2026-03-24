@@ -1,8 +1,8 @@
 //! APIs exposing `crate::parquet`'s statistics as arrow's statistics.
 use arrow::array::{
     Array, BinaryViewArray, BooleanArray, FixedSizeBinaryArray, MutableBinaryViewArray,
-    MutableBooleanArray, MutableFixedSizeBinaryArray, MutablePrimitiveArray,
-    PrimitiveArray, Utf8ViewArray,
+    MutableBooleanArray, MutableFixedSizeBinaryArray, MutablePrimitiveArray, PrimitiveArray, 
+    Utf8ViewArray,
 };
 use arrow::datatypes::{ArrowDataType, Field, IntegerType, IntervalUnit, TimeUnit};
 use arrow::types::{days_ms, i256};
