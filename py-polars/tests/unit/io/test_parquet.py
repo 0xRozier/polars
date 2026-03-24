@@ -4108,13 +4108,13 @@ def test_parquet_float_zero_normalization_26733(values: list[float]) -> None:
 
 
 def test_predicate_pushdown_null_column_schema_override_26974() -> None:
-      f = io.BytesIO()
-      pl.LazyFrame({"x": [None]}).sink_parquet(f)
-      f.seek(0)
+    f = io.BytesIO()
+    pl.LazyFrame({"x": [None]}).sink_parquet(f)
+    f.seek(0)
 
-      lf = pl.scan_parquet(f, schema={"x": pl.Boolean}).filter("x")
+    lf = pl.scan_parquet(f, schema={"x": pl.Boolean}).filter("x")
 
-      assert_frame_equal(
-          lf.collect(),
-          lf.collect(optimizations=pl.QueryOptFlags(predicate_pushdown=False)),
-      )
+    assert_frame_equal(
+        lf.collect(),
+        lf.collect(optimizations=pl.QueryOptFlags(predicate_pushdown=False)),
+    )
