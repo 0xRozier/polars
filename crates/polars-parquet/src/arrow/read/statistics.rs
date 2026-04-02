@@ -1,8 +1,8 @@
 //! APIs exposing `crate::parquet`'s statistics as arrow's statistics.
 use arrow::array::{
     Array, BinaryViewArray, BooleanArray, FixedSizeBinaryArray, MutableBinaryViewArray,
-    MutableBooleanArray, MutableFixedSizeBinaryArray, MutablePrimitiveArray, PrimitiveArray,
-    Utf8ViewArray,
+    MutableBooleanArray, MutableFixedSizeBinaryArray, MutablePrimitiveArray, NullArray,
+    PrimitiveArray, Utf8ViewArray,
 };
 use arrow::datatypes::{ArrowDataType, Field, IntegerType, IntervalUnit, TimeUnit};
 use arrow::types::{days_ms, i256};
@@ -307,7 +307,6 @@ pub fn deserialize_all(
         D::Dictionary(..) => Ok(None),
         D::FixedSizeList(..) => Ok(None),
         D::Struct(..) => Ok(None),
-        D::Null => Ok(None),
 
         _ => {
             let mut null_count = MutablePrimitiveArray::<IdxSize>::with_capacity(row_groups.len());
@@ -402,6 +401,17 @@ pub fn deserialize_all(
 
             use {ArrowDataType as D, ParquetPhysicalType as PPT};
             let (min_value, max_value) = match (field.dtype(), physical_type) {
+                (D::Null, _) => {
+                    for rg in row_groups {
+                        null_count.push(Some(rg.num_rows() as IdxSize));
+                        distinct_count.push(Some(0));
+                    }
+                    (
+                        NullArray::new(ArrowDataType::Null, row_groups.len()).to_boxed(),
+                        NullArray::new(ArrowDataType::Null, row_groups.len()).to_boxed(),
+                    )
+                },
+
                 (D::Boolean, _) => rmap!(
                     expect_boolean,
                     |x: Option<bool>| ParquetResult::Ok(x),
